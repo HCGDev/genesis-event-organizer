@@ -8,8 +8,8 @@ const mg = mailgun({
 
 export const sendEmail = async ({ to, subject, text, html }) => {
   const data = {
-    from: 'Genesis Event Organizer <noreply@mail.geo.genesisbattlesofchampions.com>',
-    to: process.env.ENV === 'PROD' ? to : 'abbassalisiwjeesudden@gmail.com',
+    from: 'Genesis Event Organizer <noreply@sandboxe4a278a9b57240c9b1c576a6241a63f0.mailgun.org>',
+    to: process.env.ENV === 'PROD' ? to : 'jarrodwardell@gmail.com',
     bcc: process.env.ENV === 'PROD' ? process.env.ADMIN_EMAILS : '',
     subject,
     text,
