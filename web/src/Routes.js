@@ -24,7 +24,6 @@ const Routes = () => {
         <Route path="/tournament/{url}/{tab}/{tabOptions:Int}" page={ViewTournamentPage} name="viewTournament" />
         <Route path="/search" page={TournamentSearchPage} name="tournamentSearch" />
         <Route path="/leaderboard" page={LeaderboardPage} name="leaderboard" />
-        <Route path="/redirect/{url}" page={RedirectPage} name="externalRedirect" />
         <Private unauthenticated="login">
           <Route path="/settings" page={SettingsPage} name="settings" />
           <Route path="/settings/{tab:String}" page={SettingsPage} name="settings" />
