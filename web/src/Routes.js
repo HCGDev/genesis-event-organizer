@@ -24,14 +24,7 @@ const Routes = () => {
         <Route path="/tournament/{url}/{tab}/{tabOptions:Int}" page={ViewTournamentPage} name="viewTournament" />
         <Route path="/search" page={TournamentSearchPage} name="tournamentSearch" />
         <Route path="/leaderboard" page={LeaderboardPage} name="leaderboard" />
-        <Route
-          path="/redirect/{url}"
-          component={() => {
-            window.open(params.url)
-            return null
-          }}
-          name="externalRedirect"
-        />
+        <Route path="/redirect/{url}" page={RedirectPage} name="externalRedirect" />
         <Private unauthenticated="login">
           <Route path="/settings" page={SettingsPage} name="settings" />
           <Route path="/settings/{tab:String}" page={SettingsPage} name="settings" />
@@ -46,7 +39,7 @@ const Routes = () => {
         <Route notfound page={NotFoundPage} />
       </Set>
       <Set wrap={[MainLayout, AdminLayout]}>
-        <Private unauthenticated="login" role={['ADMIN']}>
+        <Private unauthenticated="/" role={['ADMIN']}>
           <Route path="/admin" page={AdminPage} name="admin" />
           <Route path="/admin/users/new" page={NewUserPage} name="newUser" />
           <Route path="/admin/users/{id}/edit" page={EditUserPage} name="editUser" />

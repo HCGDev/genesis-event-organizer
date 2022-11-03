@@ -119,21 +119,26 @@ export const composeMatchArrays = ({
 
     //If odd number of players, given lowest
     if (playerList.length % 2 !== 0) {
-      let playerGivenBye = null
-
       //Priority for byes: Players not given Byes, player with lowest score
-      randomizedArray(players).forEach((player, index) => {
-        if (index === 0) {
-          playerGivenBye = player
-        } else {
-          if (
-            player.byes <= playerGivenBye.byes &&
-            player.score < playerGivenBye.score
-          ) {
-            playerGivenBye = player
-          }
-        }
-      })
+      // Filter down to only acceptable nominations based on byes
+      let nominablePlayers = players.filter(
+        // filter to those with minimum amount of byes
+        (player) =>
+          player.byes < Math.max(...players.map((player) => player.byes))
+      )
+
+      // If all players have the same number of byes, reset nominable to be the full list
+      nominablePlayers =
+        nominablePlayers.length == 0 ? players : nominablePlayers
+
+      // Filter down to acceptable nominations based on scores, then select a random player
+      let playerGivenBye = randomizedArray(
+        nominablePlayers.filter(
+          (player) =>
+            player.score ==
+            Math.min(...nominablePlayers.map((player) => player.score))
+        )
+      )[0]
 
       matchArray.push([playerGivenBye.id])
       playersNotGivenMatches.splice(

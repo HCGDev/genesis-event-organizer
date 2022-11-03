@@ -16,6 +16,13 @@ import * as Sentry from '@sentry/node'
 import { isEqual } from 'date-fns'
 import tournamentCreatedEO from 'src/emails/tournamentCreatedEO'
 
+const matchPoints = {
+  win: 1,
+  tie: 0.5,
+  loss: 0,
+  bye: 1,
+}
+
 export const tournament = ({ id }) => {
   return db.tournament.findUnique({
     where: { id },
@@ -437,7 +444,7 @@ const leaderboardWithoutTies = async ({ tournamentId }) => {
     // Sort the users with the same score by their opponent win percentage, match win percentage, and then their opponent's opponent win percentage
     // If any of the users have the same opponent win percentage, sort them by their match win percentage
     // If any of the users have the same match win percentage, sort them by their opponent's opponent win percentage
-    // If the final sort is the same, keep rank the same for both, put didCorrectRank to false
+    // If the final sort is the same, keep rank the same for both, put didCorrectRank to false -- ????
     if (
       !sortedLeaderboard.find(
         (sortedPlayer) =>
@@ -1675,14 +1682,15 @@ const addPlayerMatchScore = async ({ playerMatch, matchId, match }) => {
     switch (playerMatch.result) {
       case 'WIN':
         updateData.wins = playerTourneyScore.wins + 1
-        updateData.score = playerTourneyScore.score += 1
+        updateData.score = playerTourneyScore.score += matchPoints['win']
         break
       case 'TIED':
         updateData.draws = playerTourneyScore.draws + 1
-        updateData.score = playerTourneyScore.score += 0.5
+        updateData.score = playerTourneyScore.score += matchPoints['win']
         break
       case 'LOSS':
         updateData.losses = playerTourneyScore.losses + 1
+        updateData.score = playerTourneyScore.score += matchPoints['loss']
         break
       default:
         break
@@ -1777,19 +1785,21 @@ const rollBackScores = async ({ match }) => {
     if (scores[player1]?.prevScore > scores[player2]?.prevScore) {
       // Player1 won
       updateDataPlayer1.wins = player1TourneyScore.wins - 1
-      updateDataPlayer1.score = player1TourneyScore.score - 1
+      updateDataPlayer1.score = player1TourneyScore.score - matchPoints['win']
       updateDataPlayer2.losses = player2TourneyScore.losses - 1
+      updateDataPlayer2.score = player2TourneyScore.score - matchPoints['loss']
     } else if (scores[player1]?.prevScore < scores[player2]?.prevScore) {
       // Player2 won
       updateDataPlayer2.wins = player2TourneyScore.wins - 1
-      updateDataPlayer2.score = player2TourneyScore.score - 1
+      updateDataPlayer2.score = player2TourneyScore.score - matchPoints['win']
       updateDataPlayer1.losses = player1TourneyScore.losses - 1
+      updateDataPlayer1.score = player1TourneyScore.score - matchPoints['loss']
     } else if (scores[player1]?.prevScore === scores[player2]?.prevScore) {
       // drew
       updateDataPlayer1.draws = player1TourneyScore.draws - 1
-      updateDataPlayer1.score = player1TourneyScore.score - 0.5
+      updateDataPlayer1.score = player1TourneyScore.score - matchPoints['tie']
       updateDataPlayer2.draws = player2TourneyScore.draws - 1
-      updateDataPlayer2.score = player2TourneyScore.score - 0.5
+      updateDataPlayer2.score = player2TourneyScore.score - matchPoints['tie']
     }
   }
 
@@ -2004,7 +2014,7 @@ const createSingleMatch = async ({
         await db.playerTournamentScore.update({
           data: {
             byes: playerTourneyScore.byes + 1,
-            score: playerTourneyScore.score + 1,
+            score: playerTourneyScore.score + matchPoints['bye'],
           },
           where: {
             id: playerTourneyScore.id,
