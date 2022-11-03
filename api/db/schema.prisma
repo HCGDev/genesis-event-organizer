@@ -1,0 +1,273 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native"]
+}
+
+datasource DS {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Provider {
+  id        Int      @id @default(autoincrement())
+  userId    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  uid       String   @unique
+  type      String
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id                String                  @id @default(uuid())
+  firstname         String?
+  lastname          String?
+  gender            String?
+  phone             String?
+  city              String?
+  state             String?
+  country           String?
+  zip               String?
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @default(now())
+  howHeard          String?
+  flags             Int                     @default(0)
+  adminComments     String?
+  disabled          Boolean                 @default(false)
+  disabledOn        DateTime?
+  nickname          String                  @unique
+  userPictureId     Int?
+  disabledBy        String?
+  email             String                  @unique
+  dob               String?
+  active            Boolean                 @default(true)
+  photo             UserPicture?            @relation(fields: [userPictureId], references: [id])
+  Contact           Contact[]
+  matches           PlayerMatchScore[]
+  tournamentsPlayed PlayerTournamentScore[]
+  providers         Provider[]
+  storesApproved    Store[]                 @relation("StoreApprover")
+  Store             Store[]
+  tournamentsOwned  Tournament[]            @relation("TournamentOwner")
+  Tournament        Tournament[]
+  UserUserRole      UserUserRole[]
+}
+
+model Store {
+  id          String       @id @default(uuid())
+  name        String
+  ownerId     String?
+  email       String?
+  website     String?
+  phone       String?
+  lat         Float?
+  lng         Float?
+  street1     String
+  street2     String?
+  city        String?
+  country     String?
+  state       String?
+  zip         String?
+  distributor String?
+  placeId     String?
+  approved    Boolean?
+  approvedOn  DateTime?
+  hidden      Boolean      @default(false)
+  active      Boolean      @default(true)
+  approverId  String?
+  approvedBy  User?        @relation("StoreApprover", fields: [approverId], references: [id])
+  owner       User?        @relation(fields: [ownerId], references: [id])
+  tournaments Tournament[]
+}
+
+model UserUserRole {
+  id         Int      @id @default(autoincrement())
+  userId     String
+  userRoleId Int
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+  userRole   UserRole @relation(fields: [userRoleId], references: [id])
+}
+
+model UserRole {
+  id           Int            @id @default(autoincrement())
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @default(now())
+  name         String         @unique
+  UserUserRole UserUserRole[]
+}
+
+model UserPicture {
+  id        Int      @id @default(autoincrement())
+  name      String?
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  smallUrl  String?
+  active    Boolean? @default(true)
+  user      User[]
+}
+
+model Tournament {
+  id                         Int                     @id @default(autoincrement())
+  name                       String
+  tournamentUrl              String                  @unique
+  startDate                  DateTime
+  dateStarted                DateTime?
+  dateEnded                  DateTime?
+  maxPlayers                 Int
+  nextCutoffTournament       Tournament?             @relation("TournamentCutOff")
+  previousCutoffTournament   Tournament?             @relation("TournamentCutOff", fields: [previousCutoffTournamentId], references: [id])
+  previousCutoffTournamentId Int?                    @unique
+  locationName               String
+  infoUrl                    String?
+  street1                    String?
+  street2                    String?
+  city                       String?
+  country                    String?
+  state                      String?
+  zip                        String?
+  lat                        Float?
+  lng                        Float?
+  storeId                    String?
+  ownerId                    String?
+  createdAt                  DateTime                @default(now())
+  updatedAt                  DateTime                @default(now())
+  userId                     String?
+  desc                       String?
+  active                     Boolean                 @default(true)
+  startingTimerInSeconds     Int?
+  timerLeftInSeconds         Int?
+  timerStatus                TimerStatus?
+  timerLastUpdated           DateTime?
+  publicRegistration         Boolean                 @default(true)
+  type                       String?
+  owner                      User?                   @relation("TournamentOwner", fields: [ownerId], references: [id])
+  store                      Store?                  @relation(fields: [storeId], references: [id])
+  user                       User?                   @relation(fields: [userId], references: [id])
+  matches                    Match[]
+  players                    PlayerTournamentScore[]
+  round                      Round[]
+}
+
+model Round {
+  id                      Int        @id @default(autoincrement())
+  createdAt               DateTime   @default(now())
+  updatedAt               DateTime   @default(now())
+  tournamentId            Int
+  roundNumber             Int
+  active                  Boolean    @default(true)
+  startingTimerInSeconds  Int?
+  roundTimerLeftInSeconds Int?
+  isTieBreakerRound       Boolean    @default(false)
+  tournament              Tournament @relation(fields: [tournamentId], references: [id])
+  matches                 Match[]
+}
+
+model PlayerTournamentScore {
+  id            Int        @id @default(autoincrement())
+  playerId      String?
+  tournamentId  Int
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @default(now())
+  byes          Int        @default(0)
+  active        Boolean    @default(true)
+  wonTournament Boolean    @default(false)
+  draws         Int        @default(0)
+  losses        Int        @default(0)
+  randomizer    String?
+  score         Float      @default(0)
+  wins          Int        @default(0)
+  playerName    String?
+  player        User?      @relation(fields: [playerId], references: [id])
+  tournament    Tournament @relation(fields: [tournamentId], references: [id])
+}
+
+model Match {
+  id                Int                @id @default(autoincrement())
+  roundId           Int
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @default(now())
+  tournamentId      Int
+  active            Boolean            @default(true)
+  round             Round              @relation(fields: [roundId], references: [id])
+  isTieBreakerMatch Boolean            @default(false)
+  tournament        Tournament         @relation(fields: [tournamentId], references: [id])
+  players           PlayerMatchScore[]
+}
+
+model PlayerMatchScore {
+  id         Int      @id @default(autoincrement())
+  score      Int?
+  userId     String?
+  matchId    Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+  wonMatch   Boolean? @default(false)
+  bye        Boolean  @default(false)
+  active     Boolean  @default(true)
+  playerName String?
+  match      Match    @relation(fields: [matchId], references: [id])
+  user       User?    @relation(fields: [userId], references: [id])
+}
+
+model Contact {
+  id          Int      @id @default(autoincrement())
+  name        String
+  email       String
+  text        String
+  userId      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  userContact User?    @relation(fields: [userId], references: [id])
+}
+
+model Banner {
+  id                         Int              @id @default(autoincrement())
+  backgroundUrl              String
+  mainText                   String?          @default("#8D929E")
+  subText                    String?
+  button1Link                String?
+  button1Text                String?
+  button2Link                String?
+  button2Text                String?
+  createdAt                  DateTime         @default(now())
+  updatedAt                  DateTime         @default(now())
+  active                     Boolean          @default(true)
+  condition                  BannerCondition?
+  mainTextColor              String?          @default("white")
+  mainTextFontSize           Int?             @default(48)
+  subTextColor               String?
+  subTextFontSize            Int?             @default(36)
+  textPlacement              Placement?
+  buttonsVerticalPlacement   Placement?
+  buttonsHorizontalPlacement Placement?
+  button1BackgroundColor     String?          @default("#047857")
+  button1TextColor           String?          @default("white")
+  button2BackgroundColor     String?          @default("white")
+  button2TextColor           String?          @default("#007B54")
+  buttonsFontSize            Int?             @default(24)
+}
+
+enum Placement {
+  center
+  start
+  end
+}
+
+enum BannerCondition {
+  GUEST
+  LOGGEDIN
+  EO
+  PLAYER
+  ALL
+}
+
+enum TimerStatus {
+  PENDING
+  INPROGRESS
+  PAUSED
+  STOPPED
+}

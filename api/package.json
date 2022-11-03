@@ -1,0 +1,19 @@
+{
+  "name": "api",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@redwoodjs/api": "^0.48.0",
+    "@redwoodjs/api-server": "^0.48.0",
+    "@redwoodjs/core": "^0.48.0",
+    "@redwoodjs/graphql-server": "^0.48.0",
+    "@sentry/browser": "^6.10.0",
+    "@sentry/node": "^6.10.0",
+    "@sentry/tracing": "^6.10.0",
+    "bad-words": "^3.0.4",
+    "date-fns": "^2.23.0",
+    "firebase-admin": "^9.11.1",
+    "mailgun-js": "^0.22.0",
+    "mjml": "^4.9.3"
+  }
+}
