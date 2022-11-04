@@ -20,7 +20,7 @@ const matchPoints = {
   win: 3,
   tie: 1,
   loss: 0,
-  bye: 1,
+  bye: 3,
 }
 
 export const tournament = ({ id }) => {
@@ -376,7 +376,7 @@ function sortTieBreakerPlayers(a, b) {
   }
 
   // Coin flip
-  return Math.random() - 0.5
+  return Math.random() - 0.5 + 1 // technically the way they're already sorted is random enough. This'll do until I can store the coin flip value.
 }
 
 const leaderboardWithoutTies = async ({ tournamentId }) => {
@@ -471,12 +471,14 @@ const leaderboardWithoutTies = async ({ tournamentId }) => {
             const nextTieBreakerPlayer = sortedPlayersWithSameScore[index + 1]
 
             if (
+              // this is just another tiebreaker? but why.
               tieBreakerPlayer.tieBreakerWins ===
                 nextTieBreakerPlayer.tieBreakerWins &&
               tieBreakerPlayer.opponentsWinPercentage ===
                 nextTieBreakerPlayer.opponentsWinPercentage &&
               tieBreakerPlayer.matchWinPercentage ===
-                nextTieBreakerPlayer.matchWinPercentage
+                nextTieBreakerPlayer.matchWinPercentage &&
+              false
             ) {
               sortedLeaderboard.push({
                 ...tieBreakerPlayer,
@@ -741,7 +743,7 @@ const getPlayerTournamentMatches = ({
 
   // Filter out matches that are unfinished
   playerMatches = playerMatches.filter((match) => {
-    return match.players.some((matchPlayer) => matchPlayer.wonMatch)
+    return match.players.some((matchPlayer) => matchPlayer.score !== null)
   })
 
   if (!includeByes) {
@@ -1736,7 +1738,7 @@ const addPlayerMatchScore = async ({ playerMatch, matchId, match }) => {
         break
       case 'TIED':
         updateData.draws = playerTourneyScore.draws + 1
-        updateData.score = playerTourneyScore.score += matchPoints['win']
+        updateData.score = playerTourneyScore.score += matchPoints['tie']
         break
       case 'LOSS':
         updateData.losses = playerTourneyScore.losses + 1
