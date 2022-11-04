@@ -689,7 +689,7 @@ const getMatchWinPercentage = ({ player, tournamentMatches }) => {
 
   const winPercentage = (wonMatches.length / matches.length) * 100
 
-  return winPercentage < 0.33 ? 0.33 : winPercentage
+  return (winPercentage ? winPercentage : 0) < 0.33 ? 0.33 : winPercentage
 }
 
 const getGameWinPercentage = ({ player, tournamentMatches }) => {
@@ -721,7 +721,7 @@ const getGameWinPercentage = ({ player, tournamentMatches }) => {
 
   const winPercentage = (playerWins / (playerWins + opponentWins)) * 100
 
-  return winPercentage < 0.33 ? 0.33 : winPercentage
+  return (winPercentage ? winPercentage : 0) < 0.33 ? 0.33 : winPercentage
 }
 
 // Get all the matches for a player within a given tournament
