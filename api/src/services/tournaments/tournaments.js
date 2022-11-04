@@ -17,8 +17,8 @@ import { isEqual } from 'date-fns'
 import tournamentCreatedEO from 'src/emails/tournamentCreatedEO'
 
 const matchPoints = {
-  win: 1,
-  tie: 0.5,
+  win: 3,
+  tie: 1,
   loss: 0,
   bye: 1,
 }
@@ -361,17 +361,22 @@ function sortTieBreakerPlayers(a, b) {
   }
 
   // Compare first the opponents win percentage
-  if (b.opponentsWinPercentage !== a.opponentsWinPercentage) {
-    return b.opponentsWinPercentage - a.opponentsWinPercentage
+  if (b.opponentsMatchWinPercentage !== a.opponentsMatchWinPercentage) {
+    return b.opponentsMatchWinPercentage - a.opponentsMatchWinPercentage
   }
 
-  // Compare second the match win percentage
-  if (b.matchWinPercentage !== a.matchWinPercentage) {
-    return b.matchWinPercentage - a.matchWinPercentage
+  // Compare second the game win percentage
+  if (b.gameWinPercentage !== a.gameWinPercentage) {
+    return b.gameWinPercentage - a.gameWinPercentage
   }
 
-  // Compare third the opponents OPPONENTS win percentage (not yet done)
-  return 0
+  // Compare third the opponents OPPONENTS game win percentage
+  if (b.opponentsGameWinPercentage !== a.opponentsGameWinPercentage) {
+    return b.opponentsGameWinPercentage - a.opponentsGameWinPercentage
+  }
+
+  // Coin flip
+  return Math.random() - 0.5
 }
 
 const leaderboardWithoutTies = async ({ tournamentId }) => {
@@ -542,8 +547,8 @@ const resolveTieBreaker = async ({ players = [], tournamentMatches = [] }) => {
       })
     )
 
-    const opponentsWinPercentage = Math.floor(
-      getOpponentsWinPercentage({
+    const opponentsMatchWinPercentage = Math.floor(
+      getOpponentsMatchWinPercentage({
         player,
         tournamentMatches,
       })
@@ -556,12 +561,20 @@ const resolveTieBreaker = async ({ players = [], tournamentMatches = [] }) => {
       })
     )
 
+    const opponentsGameWinPercentage = Math.floor(
+      getOpponentsGameWinPercentage({
+        player,
+        tournamentMatches,
+      })
+    )
+
     copiedPlayers.push({
       ...player,
       tieBreakerWins,
       matchWinPercentage,
-      opponentsWinPercentage,
+      opponentsMatchWinPercentage,
       gameWinPercentage,
+      opponentsGameWinPercentage,
     })
   }
 
@@ -589,7 +602,42 @@ const getTieBreakerWins = ({ player, tournamentMatches }) => {
   return wonTieBreakerMatches.length || 0
 }
 
-const getOpponentsWinPercentage = ({ player, tournamentMatches }) => {
+const getOpponentsGameWinPercentage = ({ player, tournamentMatches }) => {
+  // Get all the players matches
+  const matches = getPlayerTournamentMatches({
+    player,
+    tournamentMatches,
+    includeTieBreakerMatches: true,
+  })
+
+  // Get list of opponents
+  const opponents = matches.map((match) => {
+    return match.players.filter(
+      (matchPlayer) => matchPlayer.playerName !== player.playerName
+    )
+  })
+
+  // Get the game win percentage for each opponent
+  const opponentsWinPercentage = []
+  for (const opponent of opponents) {
+    const opponentMatchWinPercentage = getGameWinPercentage({
+      player: opponent[0],
+      tournamentMatches,
+    })
+
+    opponentsWinPercentage.push(opponentMatchWinPercentage)
+  }
+
+  const total =
+    opponentsWinPercentage.reduce((acc, curr) => acc + curr, 0) /
+    opponentsWinPercentage.length
+
+  return total || 0
+
+  // Get the opponent Game Win Percentage
+}
+
+const getOpponentsMatchWinPercentage = ({ player, tournamentMatches }) => {
   // Get all the players matches
   const matches = getPlayerTournamentMatches({
     player,
@@ -641,7 +689,7 @@ const getMatchWinPercentage = ({ player, tournamentMatches }) => {
 
   const winPercentage = (wonMatches.length / matches.length) * 100
 
-  return winPercentage || 0
+  return winPercentage < 0.33 ? 0.33 : winPercentage
 }
 
 const getGameWinPercentage = ({ player, tournamentMatches }) => {
@@ -650,10 +698,11 @@ const getGameWinPercentage = ({ player, tournamentMatches }) => {
     tournamentMatches,
     includeTieBreakerMatches: true,
   })
-  // Matches have X games, where X is the score of both players both together
+
   let opponentWins = 0
   let playerWins = 0
 
+  // Opponent Scores
   matches.forEach((match) => {
     const opponentMatchScore = match.players.find(
       (matchPlayer) => matchPlayer.playerName !== player.playerName
@@ -661,6 +710,7 @@ const getGameWinPercentage = ({ player, tournamentMatches }) => {
     opponentWins += opponentMatchScore.score
   })
 
+  // Player Scores
   matches.forEach((match) => {
     const playerMatchScore = match.players.find(
       (matchPlayer) => matchPlayer.playerName === player.playerName
@@ -671,7 +721,7 @@ const getGameWinPercentage = ({ player, tournamentMatches }) => {
 
   const winPercentage = (playerWins / (playerWins + opponentWins)) * 100
 
-  return winPercentage || 0
+  return winPercentage < 0.33 ? 0.33 : winPercentage
 }
 
 // Get all the matches for a player within a given tournament
