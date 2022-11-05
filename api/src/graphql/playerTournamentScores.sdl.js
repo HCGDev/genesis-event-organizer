@@ -8,8 +8,9 @@ export const schema = gql`
     totalScore: Float
     totalPoints: Float
     totalTournamentsPlayed: Int
-    matchWinPercentage: Float
-    opponentsWinPercentage: Float
+    gameWinPercentage: Float
+    opponentsGameWinPercentage: Float
+    opponentsMatchWinPercentage: Float
     tournamentWinPercentage: Float
     didCorrectRank: Boolean
     tieBreakerWins: Int

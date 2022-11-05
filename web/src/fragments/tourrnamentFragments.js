@@ -88,8 +88,9 @@ export const VIEW_TOURNAMENT_FIELDS = gql`
       losses
       active
       playerName
-      matchWinPercentage
-      opponentsWinPercentage
+      gameWinPercentage
+      opponentsMatchWinPercentage
+      opponentsGameWinPercentage
       tournamentWinPercentage
       tieBreakerWins
       didCorrectRank

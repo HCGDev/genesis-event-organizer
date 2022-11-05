@@ -99,30 +99,38 @@ export const timeSinceTournament = (tournamentStartDate = new Date()) => {
 export const returnTieBreakerText = (tournamentPlayer) => {
   const {
     tieBreakerWins,
-    opponentsWinPercentage,
-    matchWinPercentage,
+    opponentsMatchWinPercentage,
+    opponentsGameWinPercentage,
     gameWinPercentage,
   } = tournamentPlayer
 
-  let text =
-    'Rank is adjusted in comparison to users with same score based on following stats:'
+  let text = 'Rank is adjusted in comparison to users with same score based on '
 
   if (tieBreakerWins > 0) {
-    text += `<br />Tie Breaker Wins: ${tieBreakerWins}`
+    text += `Tie Breaker Wins: ${tieBreakerWins}`
   }
 
-  if (opponentsWinPercentage > 0) {
-    text += `<br />Opponents Win Percentage: ${Math.round(
-      opponentsWinPercentage
+  if (opponentsMatchWinPercentage > 0) {
+    text += `Opponents Match Win Percentage: ${Math.round(
+      opponentsMatchWinPercentage
     )}%`
   }
 
-  if (matchWinPercentage > 0) {
-    text += `<br />Match Win Percentage: ${Math.round(matchWinPercentage)}%`
+  if (gameWinPercentage > 0) {
+    text += `Game Win Percentage: ${Math.round(gameWinPercentage)}%`
   }
 
-  if (gameWinPercentage > 0) {
-    text += `<br />Game Win Percentage: ${Math.round(gameWinPercentage)}%`
+  if (opponentsGameWinPercentage > 0) {
+    text += `Opponents Game Win Percentage: ${Math.round(gameWinPercentage)}%`
+  }
+
+  if (
+    !tieBreakerWins > 0 &&
+    !opponentsMatchWinPercentage > 0 &&
+    !opponentsGameWinPercentage > 0 &&
+    !gameWinPercentage > 0
+  ) {
+    text += `a coin flip.`
   }
 
   return text

@@ -449,7 +449,7 @@ const leaderboardWithoutTies = async ({ tournamentId }) => {
     // Sort the users with the same score by their opponent win percentage, match win percentage, and then their opponent's opponent win percentage
     // If any of the users have the same opponent win percentage, sort them by their match win percentage
     // If any of the users have the same match win percentage, sort them by their opponent's opponent win percentage
-    // If the final sort is the same, keep rank the same for both, put didCorrectRank to false -- ????
+    // If the final sort is the same, keep rank the same for both, put didCorrectRank to false
     if (
       !sortedLeaderboard.find(
         (sortedPlayer) =>
@@ -470,50 +470,23 @@ const leaderboardWithoutTies = async ({ tournamentId }) => {
           if (index < sortedPlayersWithSameScore.length - 1) {
             const nextTieBreakerPlayer = sortedPlayersWithSameScore[index + 1]
 
-            if (
-              // this is just another tiebreaker? but why.
-              tieBreakerPlayer.tieBreakerWins ===
-                nextTieBreakerPlayer.tieBreakerWins &&
-              tieBreakerPlayer.opponentsWinPercentage ===
-                nextTieBreakerPlayer.opponentsWinPercentage &&
-              tieBreakerPlayer.matchWinPercentage ===
-                nextTieBreakerPlayer.matchWinPercentage &&
-              false
-            ) {
-              sortedLeaderboard.push({
-                ...tieBreakerPlayer,
-                rank: lastRank,
-                didCorrectRank: false,
-              })
+            sortedLeaderboard.push({
+              ...tieBreakerPlayer,
+              rank: lastRank,
+              didCorrectRank: true,
+            })
 
-              if (index === sortedPlayersWithSameScore.length - 2) {
-                sortedLeaderboard.push({
-                  ...nextTieBreakerPlayer,
-                  rank: lastRank,
-                  didCorrectRank: false,
-                })
+            lastRank++
 
-                lastRank++
-              }
-            } else {
+            if (index === sortedPlayersWithSameScore.length - 2) {
               sortedLeaderboard.push({
-                ...tieBreakerPlayer,
+                ...nextTieBreakerPlayer,
                 rank: lastRank,
                 didCorrectRank: true,
+                needsTieBreaker: true,
               })
 
               lastRank++
-
-              if (index === sortedPlayersWithSameScore.length - 2) {
-                sortedLeaderboard.push({
-                  ...nextTieBreakerPlayer,
-                  rank: lastRank,
-                  didCorrectRank: true,
-                  needsTieBreaker: true,
-                })
-
-                lastRank++
-              }
             }
           }
         })
