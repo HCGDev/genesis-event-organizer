@@ -108,28 +108,17 @@ export const returnTieBreakerText = (tournamentPlayer) => {
 
   if (tieBreakerWins > 0) {
     text += `Tie Breaker Wins: ${tieBreakerWins}`
-  }
-
-  if (opponentsMatchWinPercentage > 0) {
+  } else if (opponentsMatchWinPercentage > 0) {
     text += `Opponents Match Win Percentage: ${Math.round(
       opponentsMatchWinPercentage
     )}%`
-  }
-
-  if (gameWinPercentage > 0) {
+  } else if (gameWinPercentage > 0) {
     text += `Game Win Percentage: ${Math.round(gameWinPercentage)}%`
-  }
-
-  if (opponentsGameWinPercentage > 0) {
-    text += `Opponents Game Win Percentage: ${Math.round(gameWinPercentage)}%`
-  }
-
-  if (
-    !tieBreakerWins > 0 &&
-    !opponentsMatchWinPercentage > 0 &&
-    !opponentsGameWinPercentage > 0 &&
-    !gameWinPercentage > 0
-  ) {
+  } else if (opponentsGameWinPercentage > 0) {
+    text += `Opponents Game Win Percentage: ${Math.round(
+      opponentsGameWinPercentage
+    )}%`
+  } else {
     text += `a coin flip.`
   }
 
