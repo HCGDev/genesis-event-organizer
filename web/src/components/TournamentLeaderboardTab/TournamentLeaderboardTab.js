@@ -119,10 +119,10 @@ const TournamentLeaderboardTab = ({ tournament, setTournament }) => {
                 )}
               </td>
               <td className="text-center py-2 extra-info">
-                {playerScore.opponentsMatchWinPercentage}
+                {playerScore.tieBreakerWins}
               </td>
               <td className="text-center py-2 extra-info">
-                {playerScore.tieBreakerWins}
+                {playerScore.opponentsMatchWinPercentage}
               </td>
               <td className="text-center py-2 extra-info">
                 {playerScore.gameWinPercentage}
