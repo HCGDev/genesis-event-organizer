@@ -102,7 +102,6 @@ const TournamentLeaderboardTab = ({ tournament, setTournament }) => {
               </td>
               <td className="text-center py-2">{playerScore.wins}</td>
               <td className="text-center py-2">{playerScore.draws}</td>
-              <td className="text-center py-2">{playerScore.byes}</td>
               <td className="text-center py-2">{playerScore.losses}</td>
               <td className="text-center py-2">
                 {playerScore.score}
@@ -117,6 +116,9 @@ const TournamentLeaderboardTab = ({ tournament, setTournament }) => {
                     place="left"
                   ></ToolTip>
                 )}
+              </td>
+              <td className="text-center py-2 extra-info">
+                {playerScore.byes}
               </td>
               <td className="text-center py-2 extra-info">
                 {playerScore.tieBreakerWins}
