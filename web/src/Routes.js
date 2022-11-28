@@ -4,6 +4,7 @@ import PlayerMatchScoresLayout from 'src/layouts/PlayerMatchScoresLayout'
 import MatchesLayout from 'src/layouts/MatchesLayout'
 import PlayerTournamentScoresLayout from 'src/layouts/PlayerTournamentScoresLayout'
 import AdminLayout from './layouts/AdminLayout/AdminLayout'
+import DevelopmentLayout from './layouts/DevelopmentLayout/DevelopmentLayout'
 import MainLayout from './layouts/MainLayout/MainLayout'
 
 const Routes = () => {
@@ -93,6 +94,7 @@ const Routes = () => {
           <Route path="/admin/contacts/{id:Int}/edit" page={EditContactPage} name="editContact" />
           <Route path="/admin/contacts/{id:Int}" page={ContactPage} name="contact" />
           <Route path="/admin/contacts" page={ContactsPage} name="contacts" />
+          <Route path="/admin/development" page={DevelopmentPage} name="development" />
         </Private>
       </Set>
     </Router>

@@ -54,13 +54,44 @@ const TournamentLeaderboardTab = ({ tournament, setTournament }) => {
       }) ? (
         <table className="w-full">
           <tr className="bg-gray-100 w-full text-center text-xs text-gray-500 uppercase leading-4 font-normal">
-            <th className="py-2">Rank</th>
+            <th className="py-2">
+              Rank
+              <ToolTip
+                text="Rank for those with the same score is decided based on their OMW, GWP, and OGW. If all of those are the same, a coin flip decides."
+                iconClass="h-5 w-5 inline-block ml-2"
+                place="left"
+              ></ToolTip>
+            </th>
             <th className="py-2">Nickname</th>
             <th className="py-2">Wins</th>
             <th className="py-2">Draws</th>
-            <th className="py-2">Byes</th>
             <th className="py-2">Losses</th>
             <th className="py-2">Points</th>
+            <th className="py-2 extra-info">Byes</th>
+            <th className="py-2 extra-info">
+              OMW
+              <ToolTip
+                text="Opponent Match Win Percentage"
+                iconClass="h-5 w-5 inline-block ml-2"
+                place="left"
+              ></ToolTip>
+            </th>
+            <th className="py-2 extra-info">
+              GWP
+              <ToolTip
+                text="Player Game Win Percentage"
+                iconClass="h-5 w-5 inline-block ml-2"
+                place="left"
+              ></ToolTip>
+            </th>
+            <th className="py-2 extra-info">
+              OGW
+              <ToolTip
+                text="Opponent Game Win Percentage"
+                iconClass="h-5 w-5 inline-block ml-2"
+                place="left"
+              ></ToolTip>
+            </th>
             {!tournament.dateEnded &&
               checkTournamentPermissions({
                 tournament,
@@ -98,21 +129,28 @@ const TournamentLeaderboardTab = ({ tournament, setTournament }) => {
               </td>
               <td className="text-center py-2">{playerScore.wins}</td>
               <td className="text-center py-2">{playerScore.draws}</td>
-              <td className="text-center py-2">{playerScore.byes}</td>
               <td className="text-center py-2">{playerScore.losses}</td>
               <td className="text-center py-2">
                 {playerScore.score}
-                {(playerScore.didCorrectRank ||
-                  (index !== tournament.players.length - 1 &&
-                    tournament.players[index + 1].rank !== playerScore.rank &&
-                    tournament.players[index + 1].score ===
-                      playerScore.score)) && (
+                {playerScore.tieBreakerWins > 0 && (
                   <ToolTip
-                    text={returnTieBreakerText(playerScore)}
+                    text={`Player has won ${playerScore.tieBreakerWins} tiebreakers.`}
                     iconClass="h-5 w-5 inline-block ml-2"
                     place="left"
                   ></ToolTip>
                 )}
+              </td>
+              <td className="text-center py-2 extra-info">
+                {playerScore.byes}
+              </td>
+              <td className="text-center py-2 extra-info">
+                {playerScore.opponentsMatchWinPercentage}
+              </td>
+              <td className="text-center py-2 extra-info">
+                {playerScore.gameWinPercentage}
+              </td>
+              <td className="text-center py-2 extra-info">
+                {playerScore.opponentsGameWinPercentage}
               </td>
               {!tournament.dateEnded &&
                 checkTournamentPermissions({

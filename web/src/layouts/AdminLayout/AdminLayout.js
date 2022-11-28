@@ -15,6 +15,7 @@ const AdminLayout = ({ children }) => {
     'user-pictures',
     'user-user-roles',
     'contacts',
+    'development',
   ]
 
   const renderTabNav = () => {
