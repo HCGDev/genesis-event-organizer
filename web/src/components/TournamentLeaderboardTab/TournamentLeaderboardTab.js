@@ -58,9 +58,13 @@ const TournamentLeaderboardTab = ({ tournament, setTournament }) => {
             <th className="py-2">Nickname</th>
             <th className="py-2">Wins</th>
             <th className="py-2">Draws</th>
-            <th className="py-2">Byes</th>
             <th className="py-2">Losses</th>
             <th className="py-2">Points</th>
+            <th className="py-2 extra-info">Byes</th>
+            <th className="py-2 extra-info">TBW</th>
+            <th className="py-2 extra-info">OMW</th>
+            <th className="py-2 extra-info">GWP</th>
+            <th className="py-2 extra-info">OGWP</th>
             {!tournament.dateEnded &&
               checkTournamentPermissions({
                 tournament,
@@ -113,6 +117,18 @@ const TournamentLeaderboardTab = ({ tournament, setTournament }) => {
                     place="left"
                   ></ToolTip>
                 )}
+              </td>
+              <td className="text-center py-2 extra-info">
+                {playerScore.opponentsMatchWinPercentage}
+              </td>
+              <td className="text-center py-2 extra-info">
+                {playerScore.tieBreakerWins}
+              </td>
+              <td className="text-center py-2 extra-info">
+                {playerScore.gameWinPercentage}
+              </td>
+              <td className="text-center py-2 extra-info">
+                {playerScore.opponentsGameWinPercentage}
               </td>
               {!tournament.dateEnded &&
                 checkTournamentPermissions({
